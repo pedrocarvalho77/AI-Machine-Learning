@@ -1,0 +1,6 @@
+referir como tratamos dos missing values!
+
+verficar se ao dropar colunas ou linhas nao ha +erda de informaçao importante
+https://medium.com/bycodegarage/a-comprehensive-guide-on-handling-missing-values-b1257a4866d1
+
+python-graphviz
