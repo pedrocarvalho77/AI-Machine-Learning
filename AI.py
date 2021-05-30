@@ -3,8 +3,10 @@ from sklearn import tree
 from sklearn.model_selection import train_test_split
 from sklearn.model_selection import cross_validate
 from sklearn.metrics import confusion_matrix
+from sklearn.metrics import ConfusionMatrixDisplay
 from IPython.display import Image
 import pydotplus
+import matplotlib.pyplot as plt
 
 def calc_mean_median_mode():
     for i in my_list:
@@ -21,22 +23,23 @@ def replace_missing_values():
 
 def holdout(clf,size):
     X_train, X_test, y_train, y_test = train_test_split(X,y,test_size=size,random_state=42)
-    """print("X_train\n",X_train)
-    print("X_train\n",X_train.shape)
-    print("y_train\n",y_train)
-    print("X_test\n",X_test)
-    print("X_test\n",X_test.shape)
-    print("y_test\n",y_test)"""
     clf = clf.fit(X_train,y_train)
+    y_predict = clf.predict(X_test)
+    get_confusion_matrix(X_test,y_test,y_predict)
 
 def cross_validation(clf,size):
-    scoring = ['accuracy', 'precision','recall']
+    scoring = ['accuracy','precision','recall','f1']
     scores = cross_validate(clf,X,y,cv=size,scoring=scoring)
-    confusion_matrix()
+    #get_confusion_matrix()
+    print_all_scores(scoring,scores,True)
 
-    print(scores.keys())
-    print_all_scores(scoring,scores,False)
- 
+def get_confusion_matrix(X_test,y_test,y_predict):
+    cm = confusion_matrix(y_test,y_predict)
+    cm_disp = ConfusionMatrixDisplay(confusion_matrix=cm, display_labels= clf.classes_)
+    cm_disp.plot(values_format=None,colorbar=False)
+    plt.savefig('confusion_matrix.svg')
+
+
 def print_all_scores(scoring,scores,mean):
     for i in scoring:
         if mean == True:
@@ -67,8 +70,8 @@ print("\nCondition to verify if there more then 70% of nulls per column\n" ,spee
 #como em nenhuma situaçao tal se verifica nao eliminamos colunas
 
 # Eliminar linhas
-mod_speedDating = speedDating.dropna()
-mod_speedDating.info()
+row_speedDating = speedDating.dropna()
+row_speedDating.info()
 
 #remove cerca de 18% das linhas o que tendo em conta que sao apenas 8378
 #creio que sao demasiadas para este problema, assims sendo nao serao removidas linhas
@@ -83,7 +86,7 @@ y = speedDating["match"]
 clf = tree.DecisionTreeClassifier()
 
 holdout(clf,0.3)
-cross_validation(clf,5)
+#cross_validation(clf,5)
 
 """
 print(clf.get_depth())
@@ -95,12 +98,4 @@ print(clf.predict_proba([[5,11,15,13,3,3,2,0.7,3,0,8,1]]))
 print(clf.predict_proba([[5,11,15,13,3,3,2,0.7,3,0,3,1]]))
 """
 
-export_tree(4)
-
-#funcoes para avaliar desempenho
-#accuracy_score()
-#error rate
-#confusion_matrix()
-#precision_recall_fscore_support()
-#median_absolute_error()
-#mean_squared_error()
+#export_tree(4)

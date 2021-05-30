@@ -17,5 +17,3 @@ explicar os imports
 #error rate
 #confusion_matrix()
 #precision_recall_fscore_support()
-#median_absolute_error()
-#mean_squared_error()
