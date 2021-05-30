@@ -4,3 +4,18 @@ verficar se ao dropar colunas ou linhas nao ha +erda de informaçao importante
 https://medium.com/bycodegarage/a-comprehensive-guide-on-handling-missing-values-b1257a4866d1
 
 python-graphviz
+
+colocar isto na parte de usar alguns dados para testes:
+Learning the parameters of a prediction function and testing it on the same data is
+a methodological mistake: a model that would just repeat the labels of the samples that it has
+just seen would have a perfect score but would fail to predict anything useful on yet-unseen 
+
+explicar os imports
+
+#funcoes para avaliar desempenho
+#accuracy_score()
+#error rate
+#confusion_matrix()
+#precision_recall_fscore_support()
+#median_absolute_error()
+#mean_squared_error()
