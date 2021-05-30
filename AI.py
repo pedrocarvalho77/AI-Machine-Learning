@@ -1,6 +1,8 @@
 import pandas as pd
 from sklearn import tree
-import graphviz 
+from sklearn.model_selection import train_test_split
+from IPython.display import Image
+import pydotplus
 
 speedDating = pd.read_csv("~/Faculdade/3ano/2sem/IA/trabalho2/AI-Machine-Learning/speedDating_trab.csv")
 #print(speedDating)
@@ -38,16 +40,19 @@ def replace_missing_values():
 
 replace_missing_values()
 
-#print(speedDating.head(10))
-#print(speedDating.tail(2))
+features_names2= ['id','partner','age','age_o','goal','date','go_out','int_corr','length','met','like','prob']
+target_names = ['0','1']
+X = speedDating[["id","partner","age","age_o","goal","date","go_out","int_corr","length","met","like","prob"]]
 
-x = speedDating[["id","partner","age","age_o","goal","date","go_out","int_corr","length","met","like","prob"]]
-#print(x)
 y = speedDating["match"]
 print(y)
 
+X_train, X_test, y_train, y_test = train_test_split(X,y,test_size=0.33,random_state=42)
+
 clf = tree.DecisionTreeClassifier()
-clf = clf.fit(x,y)
+clf = clf.fit(X_train,y_train)
+
+print(clf.get_depth())
 
 print(clf.predict([[5,11,15,13,3,3,2,0.7,3,0,8,1]]))
 print(clf.predict([[5,11,15,13,3,3,2,0.7,3,0,3,1]]))
@@ -55,7 +60,10 @@ print(clf.predict([[5,11,15,13,3,3,2,0.7,3,0,3,1]]))
 print(clf.predict_proba([[5,11,15,13,3,3,2,0.7,3,0,8,1]]))
 print(clf.predict_proba([[5,11,15,13,3,3,2,0.7,3,0,3,1]]))
 
-dot_data = tree.export_graphviz(clf, out_file=None) 
-graph = graphviz.Source(dot_data) 
-graph.render("speedDating")
-#tree.plot_tree(clf)
+tree.plot_tree(clf)
+dot = tree.export_graphviz(clf,max_depth=3,out_file=None,feature_names=features_names2,class_names=target_names)
+#dot = tree.export_graphviz(clf,out_file=None,feature_names=features_names2,class_names=target_names)
+graph = pydotplus.graph_from_dot_data(dot)
+Image(graph.create_png())
+graph.write_png("tree_depth3.png")
+#graph.write_png("tree_no_depth_limit.png")
