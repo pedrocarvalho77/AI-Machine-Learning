@@ -1,7 +1,9 @@
 import pandas as pd
 from sklearn import tree
 from sklearn.model_selection import train_test_split
+from sklearn.model_selection import KFold
 from sklearn.model_selection import cross_validate
+from sklearn.model_selection import cross_val_predict
 from sklearn.metrics import confusion_matrix
 from sklearn.metrics import ConfusionMatrixDisplay
 from IPython.display import Image
@@ -25,19 +27,27 @@ def holdout(clf,size):
     X_train, X_test, y_train, y_test = train_test_split(X,y,test_size=size,random_state=42)
     clf = clf.fit(X_train,y_train)
     y_predict = clf.predict(X_test)
-    get_confusion_matrix(X_test,y_test,y_predict)
+    get_confusion_matrix(False,y_test,y_predict)
 
 def cross_validation(clf,size):
+    kf = KFold(n_splits=size,random_state=42, shuffle=True)
+    for train, test in kf.split(X):
+        print("%s %s" % (train, test))
+    clf = clf
     scoring = ['accuracy','precision','recall','f1']
+    y_predict = cross_val_predict(clf,X,y,cv=size)
+    #get_confusion_matrix(True,y_test,y_predict)
     scores = cross_validate(clf,X,y,cv=size,scoring=scoring)
-    #get_confusion_matrix()
     print_all_scores(scoring,scores,True)
 
-def get_confusion_matrix(X_test,y_test,y_predict):
+def get_confusion_matrix(cross_val,y_test,y_predict):
     cm = confusion_matrix(y_test,y_predict)
-    cm_disp = ConfusionMatrixDisplay(confusion_matrix=cm, display_labels= clf.classes_)
-    cm_disp.plot(values_format=None,colorbar=False)
-    plt.savefig('confusion_matrix.svg')
+    cm_disp = ConfusionMatrixDisplay(confusion_matrix=cm, display_labels=clf.classes_)
+    cm_disp.plot(colorbar=False)
+    if cross_val == True:
+        plt.savefig('confusion_matrix_cv.svg')
+    else:
+        plt.savefig('confusion_matrix_no_cv.svg')
 
 
 def print_all_scores(scoring,scores,mean):
@@ -52,7 +62,7 @@ def export_tree(depth):
     features_names= ['id','partner','age','age_o','goal','date','go_out','int_corr','length','met','like','prob']
     target_names = ['0','1']
     
-    dot = tree.export_graphviz(clf,max_depth=depth,out_file=None,feature_names=features_names,class_names=target_names)
+    dot = tree.export_graphviz(clf,max_depth=depth,out_file=None,feature_names=features_names,class_names=target_names,filled=True,rounded=True)
     graph = pydotplus.graph_from_dot_data(dot)
     Image(graph.create_png())
     graph_name = "tree_depth_"+str(depth)+".png"
@@ -85,17 +95,7 @@ y = speedDating["match"]
 
 clf = tree.DecisionTreeClassifier()
 
-holdout(clf,0.3)
-#cross_validation(clf,5)
+#holdout(clf,0.3)
+cross_validation(clf,5)
 
-"""
-print(clf.get_depth())
-
-print(clf.predict([[5,11,15,13,3,3,2,0.7,3,0,8,1]]))
-print(clf.predict([[5,11,15,13,3,3,2,0.7,3,0,3,1]]))
-
-print(clf.predict_proba([[5,11,15,13,3,3,2,0.7,3,0,8,1]]))
-print(clf.predict_proba([[5,11,15,13,3,3,2,0.7,3,0,3,1]]))
-"""
-
-#export_tree(4)
+#export_tree(6)
