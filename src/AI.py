@@ -1,4 +1,7 @@
 import pandas as pd
+import pydotplus
+import matplotlib.pyplot as plt
+from IPython.display import Image
 from sklearn import tree
 from sklearn.model_selection import train_test_split
 from sklearn.model_selection import KFold
@@ -9,9 +12,6 @@ from sklearn.metrics import recall_score
 from sklearn.metrics import f1_score
 from sklearn.metrics import confusion_matrix
 from sklearn.metrics import ConfusionMatrixDisplay
-from IPython.display import Image
-import pydotplus
-import matplotlib.pyplot as plt
 
 def calc_mean_median_mode(my_list,speedDating):
     for i in my_list:
@@ -56,11 +56,11 @@ def get_confusion_matrix(clf,cross_val,y_test,y_predict):
     cm = confusion_matrix(y_test,y_predict)
     cm_disp = ConfusionMatrixDisplay(confusion_matrix=cm, display_labels=clf.classes_)
     cm_disp.plot(colorbar=False)
+    file_path="/home/pedro/Faculdade/3ano/2sem/IA/trabalho2/AI-Machine-Learning/pictures/"
     if cross_val == True:
-        plt.savefig('confusion_matrix_cv.svg')
+        plt.savefig(file_path+"confusion_matrix_cv.svg")
     else:
-        plt.savefig('confusion_matrix_holdout.svg')
-
+        plt.savefig(file_path+'confusion_matrix_holdout.svg')
 
 def print_all_scores(scoring,scores,mean):
     for i in scoring:
@@ -75,7 +75,8 @@ def export_tree(depth,clf):
     dot = tree.export_graphviz(clf,max_depth=depth,out_file=None,feature_names=features_names,class_names=target_names,filled=True,rounded=True)
     graph = pydotplus.graph_from_dot_data(dot)
     Image(graph.create_png())
-    graph_name = "tree_depth_"+str(depth)+".png"
+    file_path="/home/pedro/Faculdade/3ano/2sem/IA/trabalho2/AI-Machine-Learning/pictures/"
+    graph_name = file_path+"tree_depth_"+str(depth)+".png"
     graph.write_png(graph_name)
 
 def remove_columns(speedDating):
