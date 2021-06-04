@@ -17,3 +17,7 @@ explicar os imports
 #error rate
 #confusion_matrix()
 #precision_recall_fscore_support()
+
+os dados nao estao balanceados uma vez que tenho
+match = 1 -> 1380
+match = 0 -> 6998
