@@ -21,3 +21,6 @@ explicar os imports
 os dados nao estao balanceados uma vez que tenho
 match = 1 -> 1380
 match = 0 -> 6998
+
+
+assunção de independencia dos atributos!!!!!!!!
