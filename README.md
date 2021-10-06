@@ -5,7 +5,11 @@
 ### How to use
 
 -Usar as packages do anaconda/spec-file.txt para usar o env igual ao da criação do programa
+
 -Posteriormente compilar e correr o programa normalmente
+
 -No nosso caso usamos o IDE vscode para correr o programa
+
 -O diretorio pictures contem os graficos de cada execução
+
 -O diretorio pictures_examples contem os graficos dos exemplos usados no relatorio
