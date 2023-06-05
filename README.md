@@ -4,11 +4,11 @@
 
 ### How to use
 
-- Usar as packages do anaconda/spec-file.txt para usar o env igual ao da criação do programa
-- Posteriormente compilar e correr o programa normalmente
+- Use the packages in anaconda/spec-file.txt to use the same environment as the original
+- Then compile and run the program
 
 #### Other info
 
-- No nosso caso usamos o IDE vscode para correr o programa
-- O diretorio pictures contem os graficos de cada execução
-- O diretorio pictures_examples contem os graficos dos exemplos usados no relatorio
+- Used the IDE VS Code to run the program
+- The pictures directory contains the graphs of each run
+- The pictures_examples directory contains the graphs of the examples used in the report
