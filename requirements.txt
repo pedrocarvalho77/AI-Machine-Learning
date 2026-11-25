@@ -1,0 +1,5 @@
+pandas>=1.2
+scikit-learn>=1.0
+matplotlib>=3.4
+pydotplus==2.0.2
+# pydotplus also needs the Graphviz binaries (brew install graphviz / apt install graphviz)

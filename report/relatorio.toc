@@ -1,0 +1,18 @@
+\babel@toc {portuguese}{}\relax 
+\contentsline {section}{Resumo}{2}{section*.1}%
+\contentsline {section}{\numberline {1}Introdução}{2}{section.1}%
+\contentsline {section}{\numberline {2}Algoritmos}{3}{section.2}%
+\contentsline {subsection}{\numberline {2.1}Árvores de Decisão e CART}{3}{subsection.2.1}%
+\contentsline {subsection}{\numberline {2.2}Naive Bayes}{4}{subsection.2.2}%
+\contentsline {section}{\numberline {3}Análise exploratória dos dados}{5}{section.3}%
+\contentsline {subsection}{\numberline {3.1}Valores nulos}{5}{subsection.3.1}%
+\contentsline {subsection}{\numberline {3.2}Estimação do desempenho}{6}{subsection.3.2}%
+\contentsline {subsection}{\numberline {3.3}Desbalanceamento das classes}{6}{subsection.3.3}%
+\contentsline {section}{\numberline {4}Experiências e resultados}{7}{section.4}%
+\contentsline {subsection}{\numberline {4.1}Metodologia experimental}{7}{subsection.4.1}%
+\contentsline {subsection}{\numberline {4.2}Resultados}{8}{subsection.4.2}%
+\contentsline {subsection}{\numberline {4.3}Experiências adicionais}{8}{subsection.4.3}%
+\contentsline {subsection}{\numberline {4.4}Discussão crítica}{9}{subsection.4.4}%
+\contentsline {subsection}{\numberline {4.5}Limitações e dificuldades}{10}{subsection.4.5}%
+\contentsline {section}{\numberline {5}Conclusões}{11}{section.5}%
+\contentsline {section}{\numberline {A}Matrizes de confusão por partição}{12}{appendix.A}%

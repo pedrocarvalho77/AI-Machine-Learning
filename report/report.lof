@@ -1,0 +1,4 @@
+\babel@toc {english}{}\relax 
+\contentsline {figure}{\numberline {1}{\ignorespaces First 6 levels of the decision tree: top, trained in the holdout; bottom, trained on the last cross-validation fold.}}{8}{figure.caption.4}%
+\contentsline {figure}{\numberline {2}{\ignorespaces Confusion matrices of the decision tree (CART).}}{12}{figure.caption.7}%
+\contentsline {figure}{\numberline {3}{\ignorespaces Confusion matrices of Gaussian Naive Bayes.}}{13}{figure.caption.8}%

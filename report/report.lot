@@ -1,0 +1,4 @@
+\babel@toc {english}{}\relax 
+\contentsline {table}{\numberline {1}{\ignorespaces Confusion matrices (TN, FP, FN and TP). The matrices of each fold are in appendix~\ref {app:cm}.}}{7}{table.caption.2}%
+\contentsline {table}{\numberline {2}{\ignorespaces Performance metrics (positive class: \texttt {match} = 1). CV: 5-fold cross-validation.}}{8}{table.caption.3}%
+\contentsline {table}{\numberline {3}{\ignorespaces Additional experiments with 5-fold stratified cross-validation.}}{8}{table.caption.5}%
