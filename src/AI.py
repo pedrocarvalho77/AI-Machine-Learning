@@ -127,10 +127,9 @@ def get_confusion_matrix(id,estimator_type,estimator,splitter_type,y_test,y_pred
     cm_disp = ConfusionMatrixDisplay(confusion_matrix=cm, display_labels=estimator.classes_)
     cm_disp.plot(colorbar=False)
     file_path=str(picture_dir(estimator_type))+"/"
-    if splitter_type == "cv":
-        plt.savefig(file_path+splitter_type+"_confusion_matrix_"+id+".svg")
-    elif splitter_type == "holdout":
-        plt.savefig(file_path+splitter_type+"_confusion_matrix_"+id+".svg")
+    for ext in ("svg","pdf"):
+        plt.savefig(file_path+splitter_type+"_confusion_matrix_"+id+"."+ext)
+    plt.close()
     return tn, fp, fn, tp
 
 def print_holdout_scores(y_test,y_predict):
@@ -175,18 +174,18 @@ def main():
     balanced(speedDating)
     
     print("CLF Holdout")
-    clf = tree.DecisionTreeClassifier()
+    clf = tree.DecisionTreeClassifier(random_state=42)
     clf_holdout(X,y,clf,0.3)
     export_tree("holdout",6,clf)
 
     print("\nCLF Cross Validation")
-    clf = tree.DecisionTreeClassifier()
+    clf = tree.DecisionTreeClassifier(random_state=42)
     clf_cross_validation(X,y,clf,5)
     export_tree("cv",6,clf)
 
     print("\nGNB Holdout")
     gnb = GaussianNB()
-    gnb_holdout(X,y,gnb,0.5)
+    gnb_holdout(X,y,gnb,0.3)
     
     print("\nGNB Cross Validation")
     gnb = GaussianNB()
