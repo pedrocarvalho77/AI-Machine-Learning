@@ -6,7 +6,9 @@ import matplotlib.pyplot as plt
 from sklearn import tree
 from sklearn.naive_bayes import GaussianNB
 from sklearn.model_selection import train_test_split
-from sklearn.model_selection import KFold
+from sklearn.model_selection import StratifiedKFold, cross_val_predict
+from sklearn.pipeline import make_pipeline
+from sklearn.impute import SimpleImputer
 from sklearn.metrics import accuracy_score
 from sklearn.metrics import precision_score
 from sklearn.metrics import recall_score
@@ -42,11 +44,6 @@ def calc_mean_median_mode(my_list,speedDating,metric):
                 print(speedDating[i].mode())
     print()
 
-def replace_missing_values(my_list,speedDating):
-    for i in my_list:
-        if i != 'Unnamed: 0' and i != 'match':
-            speedDating[i] = speedDating[i].fillna(speedDating[i].mean())
-
 def balanced(speedDating):
     positive = len(speedDating[speedDating.match==1])
     negative = len(speedDating[speedDating.match==0])
@@ -58,20 +55,20 @@ def balanced(speedDating):
         print("Data is balanced\n")
 
 def clf_holdout(X,y,clf,size):
-    X_train, X_test, y_train, y_test = train_test_split(X,y,test_size=size,random_state=42)
+    X_train, X_test, y_train, y_test = train_test_split(X,y,test_size=size,random_state=42,stratify=y)
     clf = clf.fit(X_train,y_train)
     y_predict = clf.predict(X_test)
     get_confusion_matrix(0,"clf",clf,"holdout",y_test,y_predict)
     print_holdout_scores(y_test,y_predict)
 
 def clf_cross_validation(X,y,clf,size):
-    kf = KFold(n_splits=size,random_state=42, shuffle=True)
+    kf = StratifiedKFold(n_splits=size,random_state=42, shuffle=True)
     id = 1
     total_tn = 0
     total_fp = 0
     total_fn = 0
     total_tp = 0
-    for train_index, test_index in kf.split(X):
+    for train_index, test_index in kf.split(X,y):
         X_train , X_test = X.iloc[train_index,:],X.iloc[test_index,:]
         y_train , y_test = y[train_index] , y[test_index]
         clf.fit(X_train,y_train)
@@ -85,19 +82,19 @@ def clf_cross_validation(X,y,clf,size):
     print_cv_scores(total_tn,total_fp,total_fn,total_tp)
 
 def gnb_holdout(X,y,gnb,size):
-    X_train, X_test, y_train, y_test = train_test_split(X, y, test_size=size, random_state=42)
+    X_train, X_test, y_train, y_test = train_test_split(X, y, test_size=size, random_state=42, stratify=y)
     y_predict = gnb.fit(X_train, y_train).predict(X_test)
     get_confusion_matrix(0,"gnb",gnb,"holdout",y_test,y_predict)
     print_holdout_scores(y_test,y_predict)
 
 def gnb_cv(X,y,gnb,size):
-    kf = KFold(n_splits=size,random_state=42, shuffle=True)
+    kf = StratifiedKFold(n_splits=size,random_state=42, shuffle=True)
     id = 1
     total_tn = 0
     total_fp = 0
     total_fn = 0
     total_tp = 0
-    for train_index, test_index in kf.split(X):
+    for train_index, test_index in kf.split(X,y):
         X_train , X_test = X.iloc[train_index,:],X.iloc[test_index,:]
         y_train , y_test = y[train_index] , y[test_index]
         gnb.fit(X_train,y_train)
@@ -109,6 +106,10 @@ def gnb_cv(X,y,gnb,size):
         total_tp += tp
         id += 1
     print_cv_scores(total_tn,total_fp,total_fn,total_tp)
+
+def model(estimator):
+    # imputation inside the pipeline: means are computed on the training data only
+    return make_pipeline(SimpleImputer(strategy="mean"), estimator)
 
 ROOT = Path(__file__).resolve().parent.parent
 
@@ -151,11 +152,27 @@ def print_cv_scores(tn,fp,fn,tp):
 def export_tree(type,depth,clf):
     features_names= ['id','partner','age','age_o','goal','date','go_out','int_corr','length','met','like','prob']
     target_names = ['0','1']
-    dot = tree.export_graphviz(clf,max_depth=depth,out_file=None,feature_names=features_names,class_names=target_names,filled=True,rounded=True)
+    dot = tree.export_graphviz(clf[-1],max_depth=depth,out_file=None,feature_names=features_names,class_names=target_names,filled=True,rounded=True)
     graph = pydotplus.graph_from_dot_data(dot)
     file_path=str(picture_dir("clf"))+"/"
     graph_name = file_path+type+"_tree_depth_"+str(depth)+".png"
     graph.write_png(graph_name)
+
+def extra_experiments(speedDating,features):
+    # 5-fold stratified CV, imputation inside the pipeline
+    no_id = [f for f in features if f not in ("id","partner")]
+    y = speedDating["match"]
+    runs = [
+        ("CART, depth 5", tree.DecisionTreeClassifier(max_depth=5,random_state=42), features),
+        ("CART, depth 5, balanced", tree.DecisionTreeClassifier(max_depth=5,class_weight="balanced",random_state=42), features),
+        ("CART, balanced", tree.DecisionTreeClassifier(class_weight="balanced",random_state=42), features),
+        ("CART, no id/partner", tree.DecisionTreeClassifier(random_state=42), no_id),
+        ("GNB, no id/partner", GaussianNB(), no_id),
+    ]
+    kf = StratifiedKFold(n_splits=5,random_state=42,shuffle=True)
+    for name,est,cols in runs:
+        p = cross_val_predict(model(est),speedDating[cols],y,cv=kf)
+        print("%-26s acc %.3f  prec %.3f  rec %.3f  f1 %.3f" % (name,accuracy_score(y,p),precision_score(y,p),recall_score(y,p),f1_score(y,p)))
 
 def main():
     speedDating = pd.read_csv(ROOT / "speedDating_trab.csv")
@@ -166,7 +183,6 @@ def main():
     my_list = list(speedDating)
 
     calc_mean_median_mode(my_list,speedDating,"mean")
-    replace_missing_values(my_list,speedDating)
 
     X = speedDating[["id","partner","age","age_o","goal","date","go_out","int_corr","length","met","like","prob"]]
     y = speedDating["match"]
@@ -174,22 +190,25 @@ def main():
     balanced(speedDating)
     
     print("CLF Holdout")
-    clf = tree.DecisionTreeClassifier(random_state=42)
+    clf = model(tree.DecisionTreeClassifier(random_state=42))
     clf_holdout(X,y,clf,0.3)
     export_tree("holdout",6,clf)
 
     print("\nCLF Cross Validation")
-    clf = tree.DecisionTreeClassifier(random_state=42)
+    clf = model(tree.DecisionTreeClassifier(random_state=42))
     clf_cross_validation(X,y,clf,5)
     export_tree("cv",6,clf)
 
     print("\nGNB Holdout")
-    gnb = GaussianNB()
+    gnb = model(GaussianNB())
     gnb_holdout(X,y,gnb,0.3)
     
     print("\nGNB Cross Validation")
-    gnb = GaussianNB()
+    gnb = model(GaussianNB())
     gnb_cv(X,y,gnb,5)
+
+    print("\nExtra experiments (5-fold CV)")
+    extra_experiments(speedDating,list(X.columns))
 
 if __name__ == "__main__":
     main()

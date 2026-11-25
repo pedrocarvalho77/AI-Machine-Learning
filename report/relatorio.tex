@@ -39,7 +39,7 @@
 
 \begin{abstract}
 \noindent
-Machine Learning permite inferir padrões a partir de dados. Neste trabalho usámos dois algoritmos de classificação, Árvores de Decisão (CART) e Naive Bayes Gaussiano, para prever se um encontro de \emph{speed dating}, de um estudo da Columbia University, resulta em \emph{match}. Descrevemos o pré-processamento (valores nulos substituídos pela média) e comparámos duas estratégias de avaliação, \emph{holdout} (70\%/30\%) e validação cruzada com 5 partições, usando \emph{accuracy}, \emph{precision}, \emph{recall} e F1. Os dois algoritmos atingem \emph{accuracy} entre 0,76 e 0,83, mas a classe positiva é minoritária (cerca de 16\%) e o F1 fica entre 0,29 e 0,33. O Naive Bayes tem melhor \emph{accuracy} e \emph{precision}, a árvore tem melhor \emph{recall}. A escolha entre \emph{holdout} e validação cruzada tem pouco impacto. Discutimos também as limitações do trabalho: desbalanceamento das classes, dimensão do conjunto de dados, uso do identificador como atributo e substituição de nulos feita antes da divisão treino/teste.
+Machine Learning permite inferir padrões a partir de dados. Neste trabalho usámos dois algoritmos de classificação, Árvores de Decisão (CART) e Naive Bayes Gaussiano, para prever se um encontro de \emph{speed dating}, de um estudo da Columbia University, resulta em \emph{match}. Descrevemos o pré-processamento (valores nulos substituídos pela média do conjunto de treino) e comparámos duas estratégias de avaliação, \emph{holdout} (70\%/30\%) e validação cruzada com 5 partições, usando \emph{accuracy}, \emph{precision}, \emph{recall} e F1. A \emph{accuracy} fica entre 0,76 e 0,83, mas a classe positiva é minoritária (cerca de 16\%) e o F1 fica entre 0,29 e 0,33. O Naive Bayes tem melhor \emph{accuracy} e \emph{precision}, a árvore tem melhor \emph{recall}. Em experiências adicionais, dar mais peso à classe minoritária e limitar a profundidade da árvore aumenta o F1 para 0,41, à custa da \emph{accuracy}; retirar os identificadores quase não altera os resultados. Discutimos ainda as limitações do trabalho.
 \end{abstract}
 
 \section{Introdução}
@@ -89,6 +89,14 @@ onde $p_i$ é a probabilidade da classe $i$, estimada pela frequência da classe
 
 O Naive Bayes baseia-se no teorema de Bayes: a probabilidade de uma classe dado um vetor de atributos é proporcional à probabilidade da classe (\emph{a priori}) multiplicada pela verosimilhança dos atributos nessa classe. A hipótese ``ingénua'' é que, dada a classe, os atributos são condicionalmente independentes, o que reduz muito o número de probabilidades a estimar.
 
+Em termos formais, para uma classe $y$ e atributos $x_1,\dots,x_n$,
+
+\[
+  P(y \mid x_1,\dots,x_n) \;\propto\; P(y)\prod_{k=1}^{n} P(x_k \mid y),
+\]
+
+e o modelo prevê a classe que maximiza este valor.
+
 Usámos a versão Gaussiana (\code{GaussianNB}). Para um atributo numérico $x_k$ e uma classe $y_j$, a probabilidade de observar o valor $x_k$ assume uma distribuição normal:
 
 \[
@@ -123,7 +131,7 @@ A variável objetivo é \code{match} (0/1). O atributo \code{id} é um identific
 
 Existem valores nulos no conjunto de dados. Seguimos o guia \emph{A Comprehensive guide on handling Missing Values}~\cite{missing}, segundo o qual há duas abordagens: remover linhas e/ou colunas, ou substituir os nulos por uma métrica (média, mediana ou moda). A moda seria útil para variáveis categóricas, que aqui não temos. Como os atributos são numéricos, optámos pela média em vez da mediana.
 
-Faria sentido remover uma coluna se mais de 70\% das suas entradas fossem nulas. Com 8378 linhas, o programa verifica que isso não acontece em nenhuma coluna, logo nenhuma foi removida. Quanto às linhas, remover todas as que têm pelo menos um nulo eliminaria 1498 linhas e deixaria 6878, o que nos pareceu pouco para o problema. Optámos assim por substituir os nulos pela média de cada coluna.
+Faria sentido remover uma coluna se mais de 70\% das suas entradas fossem nulas. Com 8378 linhas, o programa verifica que isso não acontece em nenhuma coluna, logo nenhuma foi removida. Quanto às linhas, remover todas as que têm pelo menos um nulo eliminaria 1498 linhas e deixaria 6878, o que nos pareceu pouco para o problema. Optámos assim por substituir os nulos pela média de cada coluna. Para evitar fuga de informação, a média é calculada só com os dados de treino de cada experiência (\code{SimpleImputer} dentro de um \code{Pipeline} do \code{scikit-learn}), e depois aplicada também ao conjunto de teste.
 
 \subsection{Estimação do desempenho}
 
@@ -140,44 +148,37 @@ Os dados não estão balanceados: 1380 exemplos têm \code{match} igual a 1 e 69
 Submetemos primeiro os dados ao pré-processamento descrito. Depois executámos cada algoritmo com as duas estratégias. Em todas as experiências usámos os mesmos parâmetros:
 
 \begin{itemize}[noitemsep]
-  \item \emph{holdout}: \code{train\_test\_split} com \code{test\_size = 0.3} (30\% para teste) e \code{random\_state = 42}, para que as divisões sejam iguais nos dois algoritmos. Esta divisão é a mesma para a árvore e para o Naive Bayes;
-  \item validação cruzada: \code{KFold} com \code{n\_splits = 5}, \code{shuffle = True} e \code{random\_state = 42};
+  \item \emph{holdout}: \code{train\_test\_split} com \code{test\_size = 0.3} (30\% para teste), \code{random\_state = 42} e \code{stratify = y}, para manter a proporção de classes nos dois conjuntos. A divisão é a mesma para a árvore e para o Naive Bayes;
+  \item validação cruzada: \code{StratifiedKFold} com \code{n\_splits = 5}, \code{shuffle = True} e \code{random\_state = 42}, que mantém a proporção de classes em cada partição;
   \item árvore de decisão: \code{DecisionTreeClassifier(random\_state=42)}, com os restantes parâmetros por omissão, o que torna os resultados reproduzíveis (o desempate entre atributos é aleatório);
   \item Naive Bayes: \code{GaussianNB()} com os parâmetros por omissão.
 \end{itemize}
 
 No \emph{holdout}, dividimos os dados em quatro conjuntos (\code{X\_train}, \code{X\_test}, \code{y\_train}, \code{y\_test}), treinámos com \code{fit} e previmos com \code{predict} sobre \code{X\_test}. Na validação cruzada repetimos este processo para cada uma das 5 partições.
 
-Para cada experiência calculámos a matriz de confusão. Os elementos da matriz são: $(0,0)$ verdadeiro negativo (VN), $(0,1)$ falso positivo (FP), $(1,0)$ falso negativo (FN) e $(1,1)$ verdadeiro positivo (VP). No \emph{holdout} há uma matriz por algoritmo e na validação cruzada há uma por partição (figuras~\ref{fig:cart} e~\ref{fig:gnb}). Para as métricas da validação cruzada somámos cada entrada das 5 matrizes e calculámos:
+Para cada experiência calculámos a matriz de confusão. Os elementos da matriz são: $(0,0)$ verdadeiro negativo (VN), $(0,1)$ falso positivo (FP), $(1,0)$ falso negativo (FN) e $(1,1)$ verdadeiro positivo (VP). No \emph{holdout} há uma matriz por algoritmo e na validação cruzada há uma por partição (tabela~\ref{tab:cm} e apêndice~\ref{app:cm}). Para as métricas da validação cruzada somámos cada entrada das 5 matrizes e calculámos:
 
 \begin{align*}
   \text{accuracy} &= \frac{VP+VN}{VP+VN+FP+FN}, & \text{precision} &= \frac{VP}{VP+FP},\\
   \text{recall} &= \frac{VP}{VP+FN}, & F_1 &= \frac{2\cdot\text{precision}\cdot\text{recall}}{\text{precision}+\text{recall}}.
 \end{align*}
 
-\begin{figure}[H]
+\begin{table}[H]
   \centering
-  \begin{subfigure}{0.43\textwidth}\includegraphics[width=\textwidth]{clf/holdout_confusion_matrix_.pdf}\caption{Holdout}\end{subfigure}
-  \begin{subfigure}{0.43\textwidth}\includegraphics[width=\textwidth]{clf/cv_confusion_matrix_1.pdf}\caption{CV, partição 1}\end{subfigure}
-  \begin{subfigure}{0.43\textwidth}\includegraphics[width=\textwidth]{clf/cv_confusion_matrix_2.pdf}\caption{CV, partição 2}\end{subfigure}\\[0.5em]
-  \begin{subfigure}{0.43\textwidth}\includegraphics[width=\textwidth]{clf/cv_confusion_matrix_3.pdf}\caption{CV, partição 3}\end{subfigure}
-  \begin{subfigure}{0.43\textwidth}\includegraphics[width=\textwidth]{clf/cv_confusion_matrix_4.pdf}\caption{CV, partição 4}\end{subfigure}
-  \begin{subfigure}{0.43\textwidth}\includegraphics[width=\textwidth]{clf/cv_confusion_matrix_5.pdf}\caption{CV, partição 5}\end{subfigure}
-  \caption{Matrizes de confusão da árvore de decisão (CART).}
-  \label{fig:cart}
-\end{figure}
-
-\begin{figure}[H]
-  \centering
-  \begin{subfigure}{0.43\textwidth}\includegraphics[width=\textwidth]{gnb/holdout_confusion_matrix_.pdf}\caption{Holdout}\end{subfigure}
-  \begin{subfigure}{0.43\textwidth}\includegraphics[width=\textwidth]{gnb/cv_confusion_matrix_1.pdf}\caption{CV, partição 1}\end{subfigure}
-  \begin{subfigure}{0.43\textwidth}\includegraphics[width=\textwidth]{gnb/cv_confusion_matrix_2.pdf}\caption{CV, partição 2}\end{subfigure}\\[0.5em]
-  \begin{subfigure}{0.43\textwidth}\includegraphics[width=\textwidth]{gnb/cv_confusion_matrix_3.pdf}\caption{CV, partição 3}\end{subfigure}
-  \begin{subfigure}{0.43\textwidth}\includegraphics[width=\textwidth]{gnb/cv_confusion_matrix_4.pdf}\caption{CV, partição 4}\end{subfigure}
-  \begin{subfigure}{0.43\textwidth}\includegraphics[width=\textwidth]{gnb/cv_confusion_matrix_5.pdf}\caption{CV, partição 5}\end{subfigure}
-  \caption{Matrizes de confusão do Naive Bayes Gaussiano.}
-  \label{fig:gnb}
-\end{figure}
+  \small
+  \begin{tabular}{lcccc}
+    \toprule
+     & VN & FP & FN & VP \\
+    \midrule
+    CART, holdout   & 1782 & 318 & 276 & 138 \\
+    CART, CV (soma das 5 partições)  & 5937 & 1061 & 909 & 471 \\
+    Naive Bayes, holdout  & 1974 & 126 & 322 & 92 \\
+    Naive Bayes, CV (soma das 5 partições)  & 6599 & 399 & 1033 & 347 \\
+    \bottomrule
+  \end{tabular}
+  \caption{Matrizes de confusão (VN, FP, FN e VP). As matrizes de cada partição estão no apêndice~\ref{app:cm}.}
+  \label{tab:cm}
+\end{table}
 
 \subsection{Resultados}
 
@@ -190,10 +191,10 @@ A tabela~\ref{tab:res} resume as métricas obtidas.
     \toprule
      & CART, holdout & CART, CV & Naive Bayes, holdout & Naive Bayes, CV \\
     \midrule
-    Accuracy  & 0,765 & 0,766 & 0,827 & 0,827 \\
-    Precision & 0,287 & 0,311 & 0,439 & 0,453 \\
-    Recall    & 0,301 & 0,347 & 0,240 & 0,246 \\
-    F1        & 0,294 & 0,328 & 0,311 & 0,319 \\
+    Accuracy  & 0,764 & 0,765 & 0,822 & 0,829 \\
+    Precision & 0,303 & 0,307 & 0,422 & 0,465 \\
+    Recall    & 0,333 & 0,341 & 0,222 & 0,251 \\
+    F1        & 0,317 & 0,323 & 0,291 & 0,326 \\
     \bottomrule
   \end{tabular}
   \caption{Métricas de desempenho (classe positiva: \code{match} = 1). CV: validação cruzada com 5 partições.}
@@ -210,35 +211,88 @@ As árvores de decisão resultantes são muito profundas. A figura~\ref{fig:arvo
   \label{fig:arvores}
 \end{figure}
 
+\subsection{Experiências adicionais}
+
+Para perceber o efeito de alguns dos problemas identificados, repetimos a validação cruzada (5 partições estratificadas) com algumas variantes. Os resultados estão na tabela~\ref{tab:extra}.
+
+\begin{table}[H]
+  \centering
+  \small
+  \begin{tabular}{lcccc}
+    \toprule
+     & Accuracy & Precision & Recall & F1 \\
+    \midrule
+    CART (base)                          & 0,765 & 0,307 & 0,341 & 0,323 \\
+    CART, profundidade máxima 5          & 0,836 & 0,512 & 0,091 & 0,154 \\
+    CART, pesos de classe balanceados    & 0,778 & 0,326 & 0,324 & 0,325 \\
+    CART, profundidade 5 e pesos balanceados & 0,627 & 0,278 & 0,791 & 0,411 \\
+    CART, sem \code{id} e \code{partner} & 0,764 & 0,300 & 0,326 & 0,312 \\
+    Naive Bayes (base)                   & 0,829 & 0,465 & 0,251 & 0,326 \\
+    Naive Bayes, sem \code{id} e \code{partner} & 0,828 & 0,457 & 0,249 & 0,322 \\
+    \bottomrule
+  \end{tabular}
+  \caption{Experiências adicionais com validação cruzada de 5 partições estratificadas.}
+  \label{tab:extra}
+\end{table}
+
+Retirar os identificadores \code{id} e \code{partner} praticamente não altera os resultados (diferenças de F1 inferiores a 0,015). Limitar a profundidade da árvore a 5 aumenta a \emph{accuracy} para 0,84, mas o \emph{recall} cai para 0,09, porque a árvore passa a prever quase sempre a classe 0. Dar mais peso à classe minoritária (\code{class\_weight='balanced'}) só tem efeito claro quando combinado com a profundidade limitada: o \emph{recall} sobe para 0,79 e o F1 para 0,41, o melhor valor que obtivemos, mas a \emph{accuracy} desce para 0,63 e a \emph{precision} para 0,28, ou seja, o modelo prevê muitos \emph{matches} que não existem. É um compromisso entre falsos positivos e falsos negativos, e a escolha depende do custo relativo de cada erro.
+
 \subsection{Discussão crítica}
 
-Com a \emph{accuracy}, nos quatro casos o modelo acerta em mais de três quartos dos casos, e o Naive Bayes é melhor (cerca de 0,83 contra 0,77). Esta métrica deve ser lida com cuidado: como 84\% dos exemplos são da classe 0, um classificador trivial teria \emph{accuracy} semelhante à do Naive Bayes. A \emph{accuracy} do CART, em particular, fica abaixo da de um classificador que prevê sempre 0.
+Com a \emph{accuracy}, o Naive Bayes é melhor (cerca de 0,82 a 0,83 contra 0,76 a 0,77). Esta métrica deve ser lida com cuidado: como 84\% dos exemplos são da classe 0, um classificador que prevê sempre 0 teria \emph{accuracy} de 0,84, superior à de qualquer dos quatro modelos base.
 
-A \emph{precision} mede, de todos os \emph{matches} previstos, quantos o são mesmo, ou seja, penaliza os falsos positivos. O Naive Bayes é claramente melhor (cerca de 0,44 a 0,45 contra 0,29 a 0,31): quando prevê \emph{match} acerta mais vezes. O \emph{recall} mede, de todos os \emph{matches} reais, quantos foram encontrados, ou seja, penaliza os falsos negativos. Aqui a árvore é melhor (0,30 e 0,35 contra 0,24 e 0,25): encontra mais \emph{matches}, ao custo de muitos falsos positivos. O Naive Bayes é mais conservador. O F1 combina as duas e é baixo em todos os casos (0,29 a 0,33), o que mostra que nenhum dos modelos prevê bem a classe minoritária. Os valores de F1 são próximos entre os dois algoritmos, pelo que não podemos dizer que um seja claramente melhor no geral.
+A \emph{precision} mede, de todos os \emph{matches} previstos, quantos o são mesmo, ou seja, penaliza os falsos positivos. O Naive Bayes é melhor (0,42 e 0,47 contra 0,30 e 0,31): quando prevê \emph{match} acerta mais vezes. O \emph{recall} mede, de todos os \emph{matches} reais, quantos foram encontrados, ou seja, penaliza os falsos negativos. Aqui a árvore é melhor (0,33 e 0,34 contra 0,22 e 0,25): encontra mais \emph{matches}, à custa de mais falsos positivos (tabela~\ref{tab:cm}). O Naive Bayes é mais conservador. O F1 combina as duas métricas e é baixo em todos os casos (0,29 a 0,33), o que mostra que nenhum dos modelos prevê bem a classe minoritária. Como os valores de F1 são próximos, não podemos dizer que um algoritmo seja claramente melhor no geral.
 
-Entre as duas estratégias de avaliação, a validação cruzada dá valores ligeiramente superiores em quase todas as métricas, mas as diferenças são pequenas (no máximo cerca de 0,05, no \emph{recall} da árvore). Com apenas uma execução de cada experiência e sem medir a variabilidade, não podemos concluir que esta diferença seja significativa.
+Entre as duas estratégias de avaliação, a validação cruzada dá valores iguais ou superiores em todas as métricas. A diferença é pequena na árvore (cerca de 0,01) e maior no Naive Bayes (cerca de 0,04 na \emph{precision} e 0,035 no F1). O \emph{holdout} avalia só 30\% dos dados (2514 exemplos, 414 positivos), pelo que é mais sensível a esse conjunto de teste em particular. Com uma só execução e sem medir a variabilidade, não podemos concluir que estas diferenças sejam significativas.
 
 \subsection{Limitações e dificuldades}
 \label{sec:limitacoes}
 
 \begin{itemize}
-  \item \textbf{Desbalanceamento.} Só cerca de 16\% dos exemplos são positivos e não aplicámos nenhuma técnica de balanceamento (por exemplo, sobreamostragem da classe minoritária, subamostragem da maioritária ou pesos por classe), nem usámos validação cruzada estratificada. Isto prejudica o \emph{recall} e o F1.
+  \item \textbf{Desbalanceamento.} Só cerca de 16\% dos exemplos são positivos. Os modelos base não usam nenhuma técnica de balanceamento, o que prejudica o \emph{recall} e o F1. Nas experiências adicionais testámos pesos por classe, mas não sobreamostragem nem subamostragem.
   \item \textbf{Dimensão dos dados.} O conjunto tem pouco mais de oito mil exemplos e, na prática, muitos deles dizem respeito aos mesmos participantes. Com mais dados esperaríamos previsões melhores.
-  \item \textbf{Identificador como atributo.} Usámos \code{id} (e \code{partner}) como atributos, embora sejam identificadores. Podem introduzir enviesamento, porque o mesmo participante aparece em várias linhas e o modelo pode aprender padrões específicos de cada pessoa. Não testámos o efeito de os retirar.
-  \item \textbf{Substituição dos nulos antes da divisão.} Calculámos a média usando todos os dados, incluindo os de teste, antes de os dividir em treino e teste. O correto seria calcular a média só no conjunto de treino, para evitar fuga de informação. O efeito esperado é pequeno.
-  \item \textbf{Árvore sem controlo de complexidade.} Não limitámos a profundidade nem podámos a árvore, pelo que há sobreajuste. Um valor de profundidade máxima escolhido por validação poderia melhorar a árvore.
-  \item \textbf{Avaliação.} Cada experiência foi executada uma só vez, com sementes fixas, pelo que não medimos a variabilidade dos resultados. Também não otimizámos hiperparâmetros.
+  \item \textbf{Identificador como atributo.} Usámos \code{id} (e \code{partner}) como atributos, embora sejam identificadores. Podem introduzir enviesamento, porque o mesmo participante aparece em várias linhas e o modelo pode aprender padrões específicos de cada pessoa. Nas experiências adicionais verificámos que retirá-los quase não altera os resultados, mas o modelo final deveria dispensá-los.
+  \item \textbf{Árvore sem controlo de complexidade.} No modelo base não limitámos a profundidade nem podámos a árvore (a profundidade chega a 27), pelo que há sobreajuste. Testámos apenas uma profundidade máxima (5), sem a escolher por validação.
+  \item \textbf{Avaliação.} Cada experiência foi executada uma só vez, com sementes fixas, pelo que não medimos a variabilidade dos resultados. Também não otimizámos hiperparâmetros. Além disso, as linhas do conjunto de dados não são independentes (o mesmo participante aparece em várias linhas), e a validação cruzada não agrupa as linhas por participante, o que pode tornar as estimativas otimistas.
   \item \textbf{Dificuldades.} A principal dificuldade foi decidir como tratar os valores nulos sem perder demasiadas linhas, e perceber que a \emph{accuracy} era uma métrica enganadora neste problema. Surgiram ainda dificuldades práticas com a exportação das árvores, que exige o Graphviz instalado no sistema além da biblioteca Python.
 \end{itemize}
 
 \section{Conclusões}
 
-Comparámos Árvores de Decisão (CART) e Naive Bayes Gaussiano na previsão de \emph{matches} em eventos de \emph{speed dating}, com \emph{holdout} e validação cruzada. O Naive Bayes tem melhor \emph{accuracy} (0,83 contra 0,77) e melhor \emph{precision}; a árvore tem melhor \emph{recall}. O F1 é baixo em todos os casos (0,29 a 0,33), porque a classe positiva é minoritária (cerca de 16\%) e a \emph{accuracy} sozinha é enganadora. A validação cruzada dá resultados ligeiramente melhores do que o \emph{holdout}, mas a diferença é pequena. A execução é muito rápida com estes dados e parâmetros. Como trabalho futuro, propomos balancear as classes, retirar os identificadores, calcular a média apenas no conjunto de treino e limitar a profundidade da árvore.
+Comparámos Árvores de Decisão (CART) e Naive Bayes Gaussiano na previsão de \emph{matches} em eventos de \emph{speed dating}, com \emph{holdout} e validação cruzada. O Naive Bayes tem melhor \emph{accuracy} (0,82 a 0,83 contra 0,76 a 0,77) e melhor \emph{precision}; a árvore tem melhor \emph{recall}. O F1 é baixo em todos os casos (0,29 a 0,33), porque a classe positiva é minoritária (cerca de 16\%) e a \emph{accuracy} sozinha engana. A validação cruzada dá resultados iguais ou ligeiramente melhores do que o \emph{holdout}. Nas experiências adicionais, combinar pesos de classe com profundidade limitada subiu o F1 para 0,41, com perda de \emph{accuracy}, e retirar os identificadores teve pouco efeito. Como trabalho futuro, propomos escolher os hiperparâmetros por validação, testar outras técnicas de balanceamento, agrupar a validação cruzada por participante e repetir as experiências com várias sementes.
 
 \begin{thebibliography}{9}
 \bibitem{missing} \emph{A Comprehensive guide on handling Missing Values}. \url{https://medium.com/bycodegarage/a-comprehensive-guide-on-handling-missing-values-b1257a4866d1}\hfill\null
 \bibitem{sklearn} Pedregosa \emph{et al.}, \emph{Scikit-learn: Machine Learning in Python}, Journal of Machine Learning Research, 12:2825--2830, 2011.
 \bibitem{russell} S. Russell e P. Norvig, \emph{Artificial Intelligence: A Modern Approach}, Pearson, 4.ª ed., 2020.
 \end{thebibliography}
+
+\appendix
+\section{Matrizes de confusão por partição}
+\label{app:cm}
+
+\begin{figure}[H]
+  \centering
+  \begin{subfigure}{0.4\textwidth}\includegraphics[width=\textwidth]{clf/holdout_confusion_matrix_.pdf}\caption{Holdout}\end{subfigure}
+  \begin{subfigure}{0.4\textwidth}\includegraphics[width=\textwidth]{clf/cv_confusion_matrix_1.pdf}\caption{CV, partição 1}\end{subfigure}
+  \begin{subfigure}{0.4\textwidth}\includegraphics[width=\textwidth]{clf/cv_confusion_matrix_2.pdf}\caption{CV, partição 2}\end{subfigure}\\[0.5em]
+  \begin{subfigure}{0.4\textwidth}\includegraphics[width=\textwidth]{clf/cv_confusion_matrix_3.pdf}\caption{CV, partição 3}\end{subfigure}
+  \begin{subfigure}{0.4\textwidth}\includegraphics[width=\textwidth]{clf/cv_confusion_matrix_4.pdf}\caption{CV, partição 4}\end{subfigure}
+  \begin{subfigure}{0.4\textwidth}\includegraphics[width=\textwidth]{clf/cv_confusion_matrix_5.pdf}\caption{CV, partição 5}\end{subfigure}
+  \caption{Matrizes de confusão da árvore de decisão (CART).}
+  \label{fig:cart}
+\end{figure}
+
+\begin{figure}[H]
+  \centering
+  \begin{subfigure}{0.4\textwidth}\includegraphics[width=\textwidth]{gnb/holdout_confusion_matrix_.pdf}\caption{Holdout}\end{subfigure}
+  \begin{subfigure}{0.4\textwidth}\includegraphics[width=\textwidth]{gnb/cv_confusion_matrix_1.pdf}\caption{CV, partição 1}\end{subfigure}
+  \begin{subfigure}{0.4\textwidth}\includegraphics[width=\textwidth]{gnb/cv_confusion_matrix_2.pdf}\caption{CV, partição 2}\end{subfigure}\\[0.5em]
+  \begin{subfigure}{0.4\textwidth}\includegraphics[width=\textwidth]{gnb/cv_confusion_matrix_3.pdf}\caption{CV, partição 3}\end{subfigure}
+  \begin{subfigure}{0.4\textwidth}\includegraphics[width=\textwidth]{gnb/cv_confusion_matrix_4.pdf}\caption{CV, partição 4}\end{subfigure}
+  \begin{subfigure}{0.4\textwidth}\includegraphics[width=\textwidth]{gnb/cv_confusion_matrix_5.pdf}\caption{CV, partição 5}\end{subfigure}
+  \caption{Matrizes de confusão do Naive Bayes Gaussiano.}
+  \label{fig:gnb}
+\end{figure}
 
 \end{document}

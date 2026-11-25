@@ -33,10 +33,12 @@ cd report && latexmk -pdf relatorio.tex
 
 | | Accuracy | Precision | Recall | F1 |
 |---|---|---|---|---|
-| CART, hold-out (70/30) | 0.765 | 0.287 | 0.301 | 0.294 |
-| CART, 5-fold CV | 0.766 | 0.311 | 0.347 | 0.328 |
-| Naive Bayes, hold-out (70/30) | 0.827 | 0.439 | 0.240 | 0.311 |
-| Naive Bayes, 5-fold CV | 0.827 | 0.453 | 0.246 | 0.319 |
+| CART, hold-out (70/30) | 0.764 | 0.303 | 0.333 | 0.317 |
+| CART, 5-fold CV | 0.765 | 0.307 | 0.341 | 0.323 |
+| Naive Bayes, hold-out (70/30) | 0.822 | 0.422 | 0.222 | 0.291 |
+| Naive Bayes, 5-fold CV | 0.829 | 0.465 | 0.251 | 0.326 |
+
+Stratified splits, missing values imputed with the training mean. The script also prints extra experiments (depth limit, class weights, without id/partner); the best F1 (0.41) is CART with depth 5 and balanced class weights, at the cost of accuracy (0.63).
 
 Only ~16% of the examples are matches, so accuracy alone is misleading. See the report for limitations.
 
