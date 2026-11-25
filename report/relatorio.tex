@@ -28,19 +28,30 @@
 
 \begin{document}
 
-\begin{center}
-  {\LARGE\bfseries Segundo Trabalho de Inteligência Artificial CC2006}\\[0.8em]
-  {\large Classificação de dados de \emph{speed dating} com Árvores de Decisão e Naive Bayes}\\[1.2em]
-  Pedro Miguel Ribeiro Carvalho, up201805068\\
-  João Paulo Macedo Sampaio, up201805112\\[0.6em]
-  Departamento de Ciência de Computadores, Faculdade de Ciências da Universidade do Porto\\
+\begin{titlepage}
+  \thispagestyle{empty}
+  \centering
+  \vspace*{1cm}
+  {\large Faculdade de Ciências da Universidade do Porto\\ Departamento de Ciência de Computadores}\\[2.5cm]
+  {\Large Inteligência Artificial CC2006}\\[0.4cm]
+  {\large 2020/2021}\\[2cm]
+  {\Huge\bfseries Segundo Trabalho Prático}\\[0.8cm]
+  {\LARGE Classificação de dados de \emph{speed dating}\\ com Árvores de Decisão e Naive Bayes}\\[3cm]
+  {\large
+  Pedro Miguel Ribeiro Carvalho, up201805068\\[0.3em]
+  João Paulo Macedo Sampaio, up201805112}\\[\fill]
   Versão revista, \today
-\end{center}
+\end{titlepage}
 
 \begin{abstract}
 \noindent
 Machine Learning permite inferir padrões a partir de dados. Neste trabalho usámos dois algoritmos de classificação, Árvores de Decisão (CART) e Naive Bayes Gaussiano, para prever se um encontro de \emph{speed dating}, de um estudo da Columbia University, resulta em \emph{match}. Descrevemos o pré-processamento (valores nulos substituídos pela média do conjunto de treino) e comparámos duas estratégias de avaliação, \emph{holdout} (70\%/30\%) e validação cruzada com 5 partições, usando \emph{accuracy}, \emph{precision}, \emph{recall} e F1. A \emph{accuracy} fica entre 0,76 e 0,83, mas a classe positiva é minoritária (cerca de 16\%) e o F1 fica entre 0,29 e 0,33. O Naive Bayes tem melhor \emph{accuracy} e \emph{precision}, a árvore tem melhor \emph{recall}. Em experiências adicionais, dar mais peso à classe minoritária e limitar a profundidade da árvore aumenta o F1 para 0,41, à custa da \emph{accuracy}; retirar os identificadores quase não altera os resultados. Discutimos ainda as limitações do trabalho.
 \end{abstract}
+
+\tableofcontents
+\listoffigures
+\listoftables
+\clearpage
 
 \section{Introdução}
 
@@ -50,6 +61,7 @@ A metodologia tem três partes. Primeiro, o pré-processamento: tratamento de va
 
 O código (pré-processamento, algoritmos e avaliação) está em \code{src/AI.py}. Usámos Python e as bibliotecas \code{pandas} (leitura e manipulação dos dados), \code{scikit-learn} (algoritmos e métricas), \code{matplotlib} (matrizes de confusão) e \code{pydotplus} com Graphviz (exportação das árvores). Nenhum algoritmo foi implementado de raiz, usámos as implementações do \code{scikit-learn}~\cite{sklearn}.
 
+\clearpage
 \section{Algoritmos}
 
 \subsection{Árvores de Decisão e CART}
@@ -105,6 +117,7 @@ Usámos a versão Gaussiana (\code{GaussianNB}). Para um atributo numérico $x_k
 
 onde $\mu_{kj}$ e $\sigma_{kj}$ são a média e o desvio padrão do atributo $k$ nos exemplos da classe $j$.
 
+\clearpage
 \section{Análise exploratória dos dados}
 \label{sec:dados}
 
@@ -141,6 +154,7 @@ Treinar e testar com o mesmo conjunto de dados é um erro metodológico, porque 
 
 Os dados não estão balanceados: 1380 exemplos têm \code{match} igual a 1 e 6998 têm \code{match} igual a 0, ou seja, a classe positiva representa cerca de 16\% dos dados. Um classificador que prevesse sempre 0 teria \emph{accuracy} de cerca de 84\%, pelo que a \emph{accuracy} sozinha engana. Por isso damos importância à \emph{precision}, ao \emph{recall} e ao F1, e voltamos a este ponto nas limitações. O programa apenas verifica e avisa que as classes estão desbalanceadas, não aplica nenhuma técnica de balanceamento.
 
+\clearpage
 \section{Experiências e resultados}
 
 \subsection{Metodologia experimental}
@@ -257,6 +271,7 @@ Entre as duas estratégias de avaliação, a validação cruzada dá valores igu
   \item \textbf{Dificuldades.} A principal dificuldade foi decidir como tratar os valores nulos sem perder demasiadas linhas, e perceber que a \emph{accuracy} era uma métrica enganadora neste problema. Surgiram ainda dificuldades práticas com a exportação das árvores, que exige o Graphviz instalado no sistema além da biblioteca Python.
 \end{itemize}
 
+\clearpage
 \section{Conclusões}
 
 Comparámos Árvores de Decisão (CART) e Naive Bayes Gaussiano na previsão de \emph{matches} em eventos de \emph{speed dating}, com \emph{holdout} e validação cruzada. O Naive Bayes tem melhor \emph{accuracy} (0,82 a 0,83 contra 0,76 a 0,77) e melhor \emph{precision}; a árvore tem melhor \emph{recall}. O F1 é baixo em todos os casos (0,29 a 0,33), porque a classe positiva é minoritária (cerca de 16\%) e a \emph{accuracy} sozinha engana. A validação cruzada dá resultados iguais ou ligeiramente melhores do que o \emph{holdout}. Nas experiências adicionais, combinar pesos de classe com profundidade limitada subiu o F1 para 0,41, com perda de \emph{accuracy}, e retirar os identificadores teve pouco efeito. Como trabalho futuro, propomos escolher os hiperparâmetros por validação, testar outras técnicas de balanceamento, usar um identificador único de participante para agrupar a validação cruzada e repetir as experiências com várias sementes.
@@ -267,6 +282,7 @@ Comparámos Árvores de Decisão (CART) e Naive Bayes Gaussiano na previsão de 
 \bibitem{russell} S. Russell e P. Norvig, \emph{Artificial Intelligence: A Modern Approach}, Pearson, 4.ª ed., 2020.
 \end{thebibliography}
 
+\clearpage
 \appendix
 \section{Matrizes de confusão por partição}
 \label{app:cm}
