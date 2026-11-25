@@ -61,8 +61,6 @@
 \section*{Resumo}
 \addcontentsline{toc}{section}{Resumo}
 Machine Learning permite inferir padrões a partir de dados. Neste trabalho usámos dois algoritmos de classificação, Árvores de Decisão (CART) e Naive Bayes Gaussiano, para prever se um encontro de \emph{speed dating}, de um estudo da Columbia University, resulta em \emph{match}. Descrevemos o pré-processamento (valores nulos substituídos pela média do conjunto de treino) e comparámos duas estratégias de avaliação, \emph{holdout} (70\%/30\%) e validação cruzada com 5 partições, usando \emph{accuracy}, \emph{precision}, \emph{recall} e F1. A \emph{accuracy} fica entre 0,76 e 0,83, mas a classe positiva é minoritária (cerca de 16\%) e o F1 fica entre 0,29 e 0,33. O Naive Bayes tem melhor \emph{accuracy} e \emph{precision}, a árvore tem melhor \emph{recall}. Em experiências adicionais, dar mais peso à classe minoritária e limitar a profundidade da árvore aumenta o F1 para 0,41, à custa da \emph{accuracy}; retirar os identificadores quase não altera os resultados. Discutimos ainda as limitações do trabalho.
-\clearpage
-
 \section{Introdução}
 
 Este trabalho foi proposto na unidade curricular de Inteligência Artificial (CC2006) e tem como objetivo criar e avaliar modelos de classificação para um conjunto de dados fornecido, recorrendo a dois algoritmos de Machine Learning: Árvores de Decisão (CART) e Naive Bayes. Os dados provêm de um estudo da Columbia University, realizado entre 2002 e 2004, sobre participantes em eventos experimentais de \emph{speed dating}. Cada participante teve encontros de quatro minutos com os outros e indicou depois se queria voltar a ver o par. A variável a prever é \code{match}, que indica se houve interesse mútuo.

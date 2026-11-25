@@ -1,18 +1,18 @@
 \babel@toc {english}{}\relax 
 \contentsline {section}{Abstract}{2}{section*.1}%
-\contentsline {section}{\numberline {1}Introduction}{3}{section.1}%
-\contentsline {section}{\numberline {2}Algorithms}{4}{section.2}%
-\contentsline {subsection}{\numberline {2.1}Decision Trees and CART}{4}{subsection.2.1}%
-\contentsline {subsection}{\numberline {2.2}Naive Bayes}{5}{subsection.2.2}%
-\contentsline {section}{\numberline {3}Exploratory data analysis}{6}{section.3}%
-\contentsline {subsection}{\numberline {3.1}Missing values}{6}{subsection.3.1}%
-\contentsline {subsection}{\numberline {3.2}Performance estimation}{7}{subsection.3.2}%
-\contentsline {subsection}{\numberline {3.3}Class imbalance}{7}{subsection.3.3}%
-\contentsline {section}{\numberline {4}Experiments and results}{8}{section.4}%
-\contentsline {subsection}{\numberline {4.1}Experimental methodology}{8}{subsection.4.1}%
-\contentsline {subsection}{\numberline {4.2}Results}{8}{subsection.4.2}%
-\contentsline {subsection}{\numberline {4.3}Additional experiments}{9}{subsection.4.3}%
-\contentsline {subsection}{\numberline {4.4}Critical discussion}{10}{subsection.4.4}%
-\contentsline {subsection}{\numberline {4.5}Limitations and difficulties}{10}{subsection.4.5}%
-\contentsline {section}{\numberline {5}Conclusions}{12}{section.5}%
-\contentsline {section}{\numberline {A}Confusion matrices per fold}{13}{appendix.A}%
+\contentsline {section}{\numberline {1}Introduction}{2}{section.1}%
+\contentsline {section}{\numberline {2}Algorithms}{3}{section.2}%
+\contentsline {subsection}{\numberline {2.1}Decision Trees and CART}{3}{subsection.2.1}%
+\contentsline {subsection}{\numberline {2.2}Naive Bayes}{4}{subsection.2.2}%
+\contentsline {section}{\numberline {3}Exploratory data analysis}{5}{section.3}%
+\contentsline {subsection}{\numberline {3.1}Missing values}{5}{subsection.3.1}%
+\contentsline {subsection}{\numberline {3.2}Performance estimation}{6}{subsection.3.2}%
+\contentsline {subsection}{\numberline {3.3}Class imbalance}{6}{subsection.3.3}%
+\contentsline {section}{\numberline {4}Experiments and results}{7}{section.4}%
+\contentsline {subsection}{\numberline {4.1}Experimental methodology}{7}{subsection.4.1}%
+\contentsline {subsection}{\numberline {4.2}Results}{7}{subsection.4.2}%
+\contentsline {subsection}{\numberline {4.3}Additional experiments}{8}{subsection.4.3}%
+\contentsline {subsection}{\numberline {4.4}Critical discussion}{9}{subsection.4.4}%
+\contentsline {subsection}{\numberline {4.5}Limitations and difficulties}{9}{subsection.4.5}%
+\contentsline {section}{\numberline {5}Conclusions}{11}{section.5}%
+\contentsline {section}{\numberline {A}Confusion matrices per fold}{12}{appendix.A}%

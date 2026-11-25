@@ -1,4 +1,4 @@
 \babel@toc {portuguese}{}\relax 
-\contentsline {figure}{\numberline {1}{\ignorespaces Primeiros 6 níveis da árvore de decisão: em cima, treinada no \emph {holdout}; em baixo, treinada na última partição da validação cruzada.}}{9}{figure.caption.4}%
-\contentsline {figure}{\numberline {2}{\ignorespaces Matrizes de confusão da árvore de decisão (CART).}}{13}{figure.caption.7}%
-\contentsline {figure}{\numberline {3}{\ignorespaces Matrizes de confusão do Naive Bayes Gaussiano.}}{14}{figure.caption.8}%
+\contentsline {figure}{\numberline {1}{\ignorespaces Primeiros 6 níveis da árvore de decisão: em cima, treinada no \emph {holdout}; em baixo, treinada na última partição da validação cruzada.}}{8}{figure.caption.4}%
+\contentsline {figure}{\numberline {2}{\ignorespaces Matrizes de confusão da árvore de decisão (CART).}}{12}{figure.caption.7}%
+\contentsline {figure}{\numberline {3}{\ignorespaces Matrizes de confusão do Naive Bayes Gaussiano.}}{13}{figure.caption.8}%
