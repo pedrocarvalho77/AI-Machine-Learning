@@ -1,4 +1,4 @@
 \babel@toc {portuguese}{}\relax 
-\contentsline {table}{\numberline {1}{\ignorespaces Matrizes de confusão (VN, FP, FN e VP). As matrizes de cada partição estão no apêndice~\ref {app:cm}.}}{8}{table.caption.4}%
-\contentsline {table}{\numberline {2}{\ignorespaces Métricas de desempenho (classe positiva: \texttt {match} = 1). CV: validação cruzada com 5 partições.}}{9}{table.caption.5}%
-\contentsline {table}{\numberline {3}{\ignorespaces Experiências adicionais com validação cruzada de 5 partições estratificadas.}}{10}{table.caption.7}%
+\contentsline {table}{\numberline {1}{\ignorespaces Matrizes de confusão (VN, FP, FN e VP). As matrizes de cada partição estão no apêndice~\ref {app:cm}.}}{8}{table.caption.2}%
+\contentsline {table}{\numberline {2}{\ignorespaces Métricas de desempenho (classe positiva: \texttt {match} = 1). CV: validação cruzada com 5 partições.}}{9}{table.caption.3}%
+\contentsline {table}{\numberline {3}{\ignorespaces Experiências adicionais com validação cruzada de 5 partições estratificadas.}}{10}{table.caption.5}%
