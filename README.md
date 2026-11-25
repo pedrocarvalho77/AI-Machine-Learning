@@ -1,14 +1,26 @@
 # AI-Machine-Learning
 
-## <p align="center">Pratical work for Inteligência Artificial CC2006. The aim of the practical work is to create and evaluate classification models for this data (experimental speed dating events) set using two Machine Learning algorithms: Decision Trees (CART or ID3) and Naive Bayes.</p>
+Practical work 2 for *Inteligência Artificial* (CC2006). It builds and evaluates classifiers on the experimental speed-dating data set (`speedDating_trab.csv`) to predict whether a date ends in a match, using two algorithms:
 
-### How to use
+- Decision Tree (CART, scikit-learn)
+- Gaussian Naive Bayes
 
-- Use the packages in anaconda/spec-file.txt to use the same environment as the original
-- Then compile and run the program
+Each is evaluated with hold-out and 5-fold cross-validation (accuracy, precision, recall, F1, confusion matrix).
 
-#### Other info
+## Layout
 
-- Used the IDE VS Code to run the program
-- The pictures directory contains the graphs of each run
-- The pictures_examples directory contains the graphs of the examples used in the report
+- `src/AI.py` – data cleaning (drop columns/rows, fill missing values with the mean), class balancing, training and evaluation
+- `speedDating_trab.csv` – data set
+- `relatorio.pdf` / `relatorio.odt` – report (Portuguese); `IA2021_TrabalhoPratico2_v2.pdf` – assignment
+- `pictures/` – confusion matrices and trees from a run; `pictures_examples/` – the ones used in the report
+- `anaconda/` – original conda environment (`environment.yml`, `spec-file.txt`)
+
+## Run
+
+```bash
+python3 -m venv .venv && source .venv/bin/activate
+pip install -r requirements.txt   # also install Graphviz (e.g. brew install graphviz)
+python src/AI.py
+```
+
+Scores are printed to the terminal. Plots are written to `pictures/` (this overwrites the committed ones).

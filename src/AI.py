@@ -1,7 +1,8 @@
+from pathlib import Path
+
 import pandas as pd
 import pydotplus
 import matplotlib.pyplot as plt
-from IPython.display import Image
 from sklearn import tree
 from sklearn.naive_bayes import GaussianNB
 from sklearn.model_selection import train_test_split
@@ -109,6 +110,13 @@ def gnb_cv(X,y,gnb,size):
         id += 1
     print_cv_scores(total_tn,total_fp,total_fn,total_tp)
 
+ROOT = Path(__file__).resolve().parent.parent
+
+def picture_dir(name):
+    d = ROOT / "pictures" / name
+    d.mkdir(parents=True, exist_ok=True)
+    return d
+
 def get_confusion_matrix(id,estimator_type,estimator,splitter_type,y_test,y_predict):
     if id == 0:
         id = ""
@@ -118,7 +126,7 @@ def get_confusion_matrix(id,estimator_type,estimator,splitter_type,y_test,y_pred
     tn, fp, fn, tp = confusion_matrix(y_test,y_predict).ravel()
     cm_disp = ConfusionMatrixDisplay(confusion_matrix=cm, display_labels=estimator.classes_)
     cm_disp.plot(colorbar=False)
-    file_path="/home/pedro/Faculdade/3ano/2sem/IA/trabalho2/AI-Machine-Learning/pictures/"+estimator_type+"/"
+    file_path=str(picture_dir(estimator_type))+"/"
     if splitter_type == "cv":
         plt.savefig(file_path+splitter_type+"_confusion_matrix_"+id+".svg")
     elif splitter_type == "holdout":
@@ -146,13 +154,12 @@ def export_tree(type,depth,clf):
     target_names = ['0','1']
     dot = tree.export_graphviz(clf,max_depth=depth,out_file=None,feature_names=features_names,class_names=target_names,filled=True,rounded=True)
     graph = pydotplus.graph_from_dot_data(dot)
-    Image(graph.create_png())
-    file_path="/home/pedro/Faculdade/3ano/2sem/IA/trabalho2/AI-Machine-Learning/pictures/clf/"
+    file_path=str(picture_dir("clf"))+"/"
     graph_name = file_path+type+"_tree_depth_"+str(depth)+".png"
     graph.write_png(graph_name)
 
 def main():
-    speedDating = pd.read_csv("~/Faculdade/3ano/2sem/IA/trabalho2/AI-Machine-Learning/speedDating_trab.csv")
+    speedDating = pd.read_csv(ROOT / "speedDating_trab.csv")
     
     remove_columns(speedDating)
     remove_row(speedDating)
@@ -172,7 +179,7 @@ def main():
     clf_holdout(X,y,clf,0.3)
     export_tree("holdout",6,clf)
 
-    print("\CLF Cross Validation")
+    print("\nCLF Cross Validation")
     clf = tree.DecisionTreeClassifier()
     clf_cross_validation(X,y,clf,5)
     export_tree("cv",6,clf)
