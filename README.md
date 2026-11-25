@@ -11,7 +11,7 @@ Each is evaluated with hold-out and 5-fold cross-validation (accuracy, precision
 
 - `src/AI.py` – data cleaning (drop columns/rows, fill missing values with the mean), class balancing, training and evaluation
 - `speedDating_trab.csv` – data set
-- `report/relatorio.tex` / `report/relatorio.pdf` – revised report in LaTeX (Portuguese); `relatorio.pdf` / `relatorio.odt` – original 2021 report; `IA2021_TrabalhoPratico2_v2.pdf` – assignment
+- `report/report.tex` / `report/report.pdf` – revised report in LaTeX (English); `report/relatorio.tex` / `report/relatorio.pdf` – same report in Portuguese; `relatorio.pdf` / `relatorio.odt` – original 2021 report; `IA2021_TrabalhoPratico2_v2.pdf` – assignment
 - `pictures/` – confusion matrices and trees from a run; `pictures_examples/` – the ones used in the report
 - `anaconda/` – original conda environment (`environment.yml`, `spec-file.txt`)
 
@@ -26,7 +26,7 @@ python src/AI.py
 Build the report (needs a TeX distribution):
 
 ```bash
-cd report && latexmk -pdf relatorio.tex
+cd report && latexmk -pdf report.tex
 ```
 
 ## Results (positive class: match)
