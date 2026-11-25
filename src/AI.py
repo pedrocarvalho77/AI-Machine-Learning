@@ -6,7 +6,7 @@ import matplotlib.pyplot as plt
 from sklearn import tree
 from sklearn.naive_bayes import GaussianNB
 from sklearn.model_selection import train_test_split
-from sklearn.model_selection import StratifiedKFold, cross_val_predict
+from sklearn.model_selection import StratifiedKFold, StratifiedGroupKFold, cross_val_predict
 from sklearn.pipeline import make_pipeline
 from sklearn.impute import SimpleImputer
 from sklearn.metrics import accuracy_score
@@ -174,6 +174,19 @@ def extra_experiments(speedDating,features):
         p = cross_val_predict(model(est),speedDating[cols],y,cv=kf)
         print("%-26s acc %.3f  prec %.3f  rec %.3f  f1 %.3f" % (name,accuracy_score(y,p),precision_score(y,p),recall_score(y,p),f1_score(y,p)))
 
+def grouped_experiments(speedDating,features):
+    # CV grouped by id (only 22 distinct values, so a coarse proxy for "same participant"); the one null id is its own group
+    no_id = [f for f in features if f not in ("id","partner")]
+    y = speedDating["match"]
+    groups = speedDating["id"].fillna(-1)
+    kf = StratifiedGroupKFold(n_splits=5,random_state=42,shuffle=True)
+    for name,est,cols in (("CART, grouped by id",tree.DecisionTreeClassifier(random_state=42),features),
+                          ("CART, grouped, no id/partner",tree.DecisionTreeClassifier(random_state=42),no_id),
+                          ("GNB, grouped by id",GaussianNB(),features),
+                          ("GNB, grouped, no id/partner",GaussianNB(),no_id)):
+        p = cross_val_predict(model(est),speedDating[cols],y,cv=kf,groups=groups)
+        print("%-28s acc %.3f  prec %.3f  rec %.3f  f1 %.3f" % (name,accuracy_score(y,p),precision_score(y,p),recall_score(y,p),f1_score(y,p)))
+
 def main():
     speedDating = pd.read_csv(ROOT / "speedDating_trab.csv")
     
@@ -209,6 +222,8 @@ def main():
 
     print("\nExtra experiments (5-fold CV)")
     extra_experiments(speedDating,list(X.columns))
+    print("\nGrouped CV (by id)")
+    grouped_experiments(speedDating,list(X.columns))
 
 if __name__ == "__main__":
     main()
